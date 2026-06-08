@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salto Lógico - Seleção de Jogos</title>
+    <!-- Tailwind CSS CDN para estilização moderna e rápida -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Fonte personalizada de estilo condensado/impactante semelhante à da imagem */
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap');
+        
+        .font-game {
+            font-family: 'Oswald', sans-serif;
+        }
+        
+        /* Suavização de transições globais */
+        a {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="bg-[#242424] text-white min-h-screen flex flex-col justify-center items-center p-6 select-none">
+
+    <!-- Container Principal do Painel -->
+    <main class="w-full max-w-4xl flex flex-col items-center justify-center">
+        
+        <!-- Título Principal da Tela (Laranja) -->
+        <h1 class="text-[#E27D30] text-4xl sm:text-5xl md:text-6xl font-game tracking-wider uppercase mb-12 sm:mb-16 md:mb-20 text-center drop-shadow-md">
+            Salto Lógico
+        </h1>
+
+        <!-- Grade de Opções (Responsiva de 1 a 3 colunas) -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-10 md:gap-16 w-full max-w-3xl px-4">
+            
+            <!-- OPCÃO 1: Salto Lógico -->
+            <!-- COLOQUE SEU LINK NO 'href' ABAIXO -->
+            <a href="/Salto.html" class="group flex flex-col items-center focus:outline-none">
+                <!-- Wrapper do Ícone (Borda arredondada preta que imita o app icon da imagem) -->
+                <div class="w-36 h-36 sm:w-32 sm:h-32 md:w-40 md:h-40 bg-[#161616] p-[6px] rounded-[32px] shadow-lg border-2 border-transparent group-hover:border-[#5289C5] group-focus:border-[#5289C5] group-hover:scale-105 active:scale-95 transform duration-300">
+                    <div class="w-full h-full rounded-[26px] overflow-hidden bg-[#78A4BA] relative flex flex-col justify-end">
+                        <!-- Desenho Minimalista do Prédio/Obstáculo -->
+                        <div class="absolute inset-0 flex flex-col justify-end items-center pb-8">
+                            <div class="w-10 h-16 bg-[#A1A1A1] border-2 border-[#8C8C8C] relative flex items-center justify-center">
+                                <!-- Pequeno quadrado vermelho de detalhe -->
+                                <div class="w-2.5 h-2.5 bg-[#D64444]"></div>
+                                <!-- Topo cinza claro -->
+                                <div class="absolute -top-3 w-7 h-3 bg-[#E1E1E1] border-x-2 border-t-2 border-[#8C8C8C]"></div>
+                            </div>
+                        </div>
+                        <!-- Chão Verde e Marrom -->
+                        <div class="w-full h-8 bg-[#497A32]"></div>
+                        <div class="w-full h-4 bg-[#70503B]"></div>
+                    </div>
+                </div>
+                <!-- Legenda do Ícone -->
+                <span class="mt-4 text-[#5289C5] text-2xl md:text-3xl font-game tracking-wide text-center uppercase group-hover:text-blue-400">
+                    Salto Lógico
+                </span>
+            </a>
+
+            <!-- OPCÃO 2: LogicO 2D -->
+            <!-- COLOQUE SEU LINK NO 'href' ABAIXO -->
+            <a href="#link-logico-2d" class="group flex flex-col items-center focus:outline-none">
+                <!-- Wrapper do Ícone -->
+                <div class="w-36 h-36 sm:w-32 sm:h-32 md:w-40 md:h-40 bg-[#161616] p-[6px] rounded-[32px] shadow-lg border-2 border-transparent group-hover:border-[#5289C5] group-focus:border-[#5289C5] group-hover:scale-105 active:scale-95 transform duration-300">
+                    <!-- Reprodução do ícone estilizado "O" da imagem -->
+                    <div class="w-full h-full rounded-[26px] bg-[#0E0E0E] flex items-center justify-center p-4">
+                        <div class="w-full h-full rounded-[24px] border-[10px] border-[#D18651] flex items-center justify-end pr-2 bg-transparent relative">
+                            <!-- Traço centralizado imitando o design interno -->
+                            <div class="w-7 h-4 bg-[#0E0E0E] rounded-sm mr-2"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Legenda do Ícone -->
+                <span class="mt-4 text-[#5289C5] text-2xl md:text-3xl font-game tracking-wide text-center uppercase group-hover:text-blue-400">
+                    LogicO 2D
+                </span>
+            </a>
+
+            <!-- OPCÃO 3: Car Lines -->
+            <!-- COLOQUE SEU LINK NO 'href' ABAIXO -->
+            <a href="#link-car-lines" class="group flex flex-col items-center focus:outline-none">
+                <!-- Wrapper do Ícone -->
+                <div class="w-36 h-36 sm:w-32 sm:h-32 md:w-40 md:h-40 bg-[#161616] p-[6px] rounded-[32px] shadow-lg border-2 border-transparent group-hover:border-[#5289C5] group-focus:border-[#5289C5] group-hover:scale-105 active:scale-95 transform duration-300">
+                    <div class="w-full h-full rounded-[26px] overflow-hidden bg-[#0A2647] relative flex items-center justify-center">
+                        
+                        <!-- Vetor SVG do Carro Vermelho com condutor (baseado na referência) -->
+                        <svg viewBox="0 0 100 100" class="w-4/5 h-4/5 object-contain" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Janela / Vidro do carro -->
+                            <path d="M 30,58 L 40,32 Q 45,28 55,28 L 78,31 Q 84,33 86,40 L 89,58 Z" fill="#203750" />
+                            <!-- Motorista (Cabeça simplificada cinza na janela) -->
+                            <circle cx="62" cy="42" r="7" fill="#888888" />
+                            <rect x="59" y="48" width="6" height="8" rx="2" fill="#777777" />
+                            <!-- Corpo do Carro Vermelho -->
+                            <path d="M 12,58 Q 25,56 30,50 L 37,33 Q 41,27 50,27 L 78,30 Q 86,32 89,41 L 91,52 Q 95,54 94,62 Q 94,68 88,68 L 16,68 Q 11,68 11,61 Z" fill="#D31D1F" />
+                            <!-- Detalhes do Carro (Para-choques, farol, maçaneta) -->
+                            <circle cx="15" cy="58" r="3" fill="#EEEEEE" /> <!-- Farol dianteiro -->
+                            <rect x="58" y="55" width="6" height="1.5" rx="0.5" fill="#EEEEEE" /> <!-- Maçaneta -->
+                            <circle cx="91" cy="58" r="2" fill="#D31D1F" /> <!-- Lanterna traseira -->
+                            <path d="M 10,61 L 20,61 Q 20,59 10,59 Z" fill="#777" /> <!-- Para-choque frontal -->
+                            <!-- Arcos das Rodas -->
+                            <path d="M 18,68 A 12,12 0 0,1 40,68 Z" fill="#0A2647" />
+                            <path d="M 68,68 A 12,12 0 0,1 90,68 Z" fill="#0A2647" />
+                            <!-- Roda Esquerda -->
+                            <circle cx="29" cy="68" r="10" fill="#222" />
+                            <circle cx="29" cy="68" r="8" fill="#AAA" />
+                            <circle cx="29" cy="68" r="5" fill="#444" />
+                            <circle cx="29" cy="68" r="2" fill="#FFF" />
+                            <!-- Roda Direita -->
+                            <circle cx="79" cy="68" r="10" fill="#222" />
+                            <circle cx="79" cy="68" r="8" fill="#AAA" />
+                            <circle cx="79" cy="68" r="5" fill="#444" />
+                            <circle cx="79" cy="68" r="2" fill="#FFF" />
+                        </svg>
+                    </div>
+                </div>
+                <!-- Legenda do Ícone -->
+                <span class="mt-4 text-[#5289C5] text-2xl md:text-3xl font-game tracking-wide text-center uppercase group-hover:text-blue-400">
+                    Car Lines
+                </span>
+            </a>
+
+        </div>
+    </main>
+
+</body>
+</html>

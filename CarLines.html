@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Car Lines - Aprenda CSS Estacionando Carros</title>
+<!-- Tailwind CSS para estilização rápida e responsiva -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Google Fonts para tipografia moderna -->
+<link
+href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&fa
+mily=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+body {
+font-family: 'Plus Jakarta Sans', sans-serif;
+background-color: #0b0f19;
+color: #f3f4f6;
+overflow-x: hidden;
+}
+.code-font {
+font-family: 'JetBrains Mono', monospace;
+}
+/* Custom scrollbars */
+::-webkit-scrollbar {
+width: 6px;
+height: 6px;
+}
+::-webkit-scrollbar-track {
+background: #111827;
+}
+::-webkit-scrollbar-thumb {
+background: #374151;
+border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+background: #4b5563;
+}
+/* Grid das vagas e pátio */
+.parking-grid {
+background-image:
+radial-gradient(#1e293b 1px, transparent 1px),
+linear-gradient(to right, #111827 1px, transparent 1px),
+linear-gradient(to bottom, #111827 1px, transparent 1px);
+background-size: 20px 20px, 40px 40px, 40px 40px;
+}
+/* Neon effects */
+.neon-border {
+box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+}
+.neon-text-green {
+text-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+}
+.neon-text-blue {
+text-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+}
+/* Animação suave para os carros */
+.car-transition {
+transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+/* Brilho das vagas */
+.spot-glow {
+box-shadow: inset 0 0 12px currentColor;
+}
+</style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+<!-- CANVAS PARA PARTÍCULAS / CONFETE -->
+<canvas id="particleCanvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
+<!-- TELA DE INÍCIO -->
+<div id="start-screen" class="fixed inset-0 bg-slate-950 z-40 flex flex-col items-center
+justify-center p-4">
+<div class="absolute inset-0 parking-grid opacity-30"></div>
+<div class="relative z-10 max-w-2xl w-full text-center space-y-8">
+<div class="inline-flex items-center gap-3 bg-slate-900 border border-slate-800 px-4
+py-2 rounded-full text-blue-400 text-sm font-medium mb-2">
+<span>⚡ Desafio de CSS Flexbox</span>
+</div>
+<h1 class="text-6xl md:text-7xl font-extrabold tracking-tight bg-clip-text text-
+transparent bg-gradient-to-r from-blue-400 via-indigo-400 to-emerald-400">
+Car Lines
+</h1>
+<p class="text-slate-400 text-lg md:text-xl max-w-lg mx-auto">
+Domine o sistema de alinhamento mais famoso da web organizando e estacionando
+super carros no pátio urbano.
+</p>
+<div class="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+<button onclick="startGame()" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r
+from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold
+rounded-xl shadow-lg shadow-indigo-500/25 transition-all transform hover:-translate-y-1
+active:scale-95 text-lg">
+Iniciar Aprendizado 🚗
+</button>
+<button onclick="showSelectorScreen()" class="w-full sm:w-auto px-8 py-4 bg-
+slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-300 font-
+semibold rounded-xl transition-all transform hover:-translate-y-1 text-lg">
+Escolher Fase
+</button>
+</div>
+<div class="pt-12 text-xs text-slate-600 flex justify-center gap-6">
+<span>🔥 10 Fases Progressivas</span>
+<span>🎮 Feedback em Tempo Real</span>
+<span>💡 Guia de Referência Incluso</span>
+</div>
+</div>
+</div>
+<!-- TELA SELETOR DE FASES -->
+<div id="selector-screen" class="fixed inset-0 bg-slate-950 z-40 hidden flex-col items-
+center justify-center p-4 overflow-y-auto">
+<div class="absolute inset-0 parking-grid opacity-20"></div>
+<div class="relative z-10 max-w-3xl w-full bg-slate-900/95 border border-slate-800
+rounded-2xl p-6 md:p-8 shadow-2xl backdrop-blur my-8">
+<div class="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
+<div>
+<h2 class="text-2xl md:text-3xl font-bold text-white">Selecione uma
+Fase</h2>
+<p class="text-slate-400 text-xs md:text-sm mt-1">Escolha uma fase para
+praticar e avançar</p>
+</div>
+<button onclick="hideSelectorScreen()" class="px-4 py-2 text-sm text-slate-400
+hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors">
+Voltar
+</button>
+</div>
+<!-- MODIFICADO: Grid ajustado para exatamente 3 colunas em telas médias/grandes -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="selector-grid">
+<!-- Injetado por JS -->
+</div>
+<div class="mt-8 pt-6 border-t border-slate-800 flex flex-col sm:flex-row gap-4
+justify-between items-center text-sm text-slate-400">
+<span id="selector-progress-txt">Fases concluídas: 0 / 10</span>
+<button onclick="resetProgress()" class="text-red-400 hover:text-red-300
+transition-colors text-xs font-semibold">
+Limpar Progresso
+</button>
+</div>
+</div>
+</div>
+<!-- GAMEPLAY INTERFACE -->
+<header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md px-6 py-4 sticky
+top-0 z-30">
+<div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center
+gap-4">
+<div class="flex items-center gap-3">
+<span class="text-2xl">⚡</span>
+<div>
+<h1 class="text-xl font-extrabold tracking-tight bg-clip-text text-
+transparent bg-gradient-to-r from-blue-400 to-indigo-400 cursor-pointer" onclick="backToHome()">
+Car Lines
+</h1>
+<p class="text-xs text-slate-500">Aprenda CSS Flexbox na prática</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button onclick="prevLevel()" class="p-2 bg-slate-800 hover:bg-slate-700
+rounded-lg text-slate-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+id="btn-prev">
+← Ant
+</button>
+<button onclick="showSelectorScreen()" class="px-4 py-2 bg-slate-800 hover:bg-
+slate-700 rounded-lg text-slate-200 font-medium transition-colors text-sm flex items-center gap-
+2">
+<span>Fase</span>
+<span id="level-indicator" class="bg-indigo-600 text-white px-2 py-0.5
+rounded font-bold">1/10</span>
+</button>
+<button onclick="nextLevel()" class="p-2 bg-slate-800 hover:bg-slate-700
+rounded-lg text-slate-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+id="btn-next">
+Próx →
+</button>
+</div>
+</div>
+</header>
+<!-- CONTEÚDO PRINCIPAL (SPLIT VIEW) -->
+<main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12
+gap-6 items-stretch">
+<!-- ESQUERDA: INSTRUÇÕES E EDITOR -->
+<section class="lg:col-span-5 flex flex-col gap-6">
+<!-- CAIXA DE INSTRUÇÕES -->
+<div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg relative
+overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+<h3 class="text-lg font-bold text-slate-100 flex items-center justify-between">
+<span id="level-title">Fase 1: Alinhamento Básico</span>
+<span class="text-xs text-slate-500 bg-slate-800 px-2.5 py-1 rounded-full
+uppercase tracking-wider" id="level-difficulty">Iniciante</span>
+</h3>
+<p id="level-instructions" class="text-slate-300 text-sm mt-3 leading-relaxed">
+Ajude o motorista a estacionar o carro vermelho no lado direito do pátio
+usando a propriedade <code class="bg-slate-800 text-amber-400 px-1.5 py-0.5 rounded text-xs
+code-font">justify-content</code>.
+</p>
+<div class="mt-4 p-3 bg-blue-950/40 border border-blue-900/40 rounded-xl">
+<span class="text-xs font-bold text-blue-400 block uppercase tracking-
+wide">💡 Dica útil:</span>
+<p id="level-hint" class="text-xs text-slate-400 mt-1 leading-relaxed">
+Experimente usar <code class="text-blue-300 code-font">justify-content:
+flex-end;</code> para alinhar itens ao final do eixo principal.
+</p>
+</div>
+</div>
+<!-- EDITOR DE CSS -->
+<div class="bg-slate-900 border border-slate-800 rounded-2xl flex-grow flex flex-col
+overflow-hidden shadow-lg">
+<!-- Cabeçalho do Editor -->
+<div class="bg-slate-950 px-4 py-3 border-b border-slate-800/80 flex justify-
+between items-center">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-red-500"></span>
+<span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+<span class="w-3 h-3 rounded-full bg-green-500"></span>
+<span class="text-xs text-slate-400 ml-2 font-semibold code-
+font">parking-style.css</span>
+</div>
+<button onclick="resetLevelInput()" class="text-xs text-slate-500
+hover:text-slate-300 transition-colors flex items-center gap-1">
+🔄 Resetar Código
+</button>
+</div>
+<!-- Corpo do Editor -->
+<div class="p-4 flex-grow flex flex-col bg-[#0d1117] code-font text-sm leading-6
+relative">
+<div class="text-slate-500 mb-1 select-none">#patio-estacionamento {</div>
+<div class="flex items-stretch flex-grow min-h-[140px]">
+<!-- Linhas estáticas decorativas -->
+<div class="text-slate-600 text-right pr-4 select-none flex flex-col
+border-r border-slate-800/60 mr-4 w-8 text-xs">
+<span>1</span>
+<span>2</span>
+<span>3</span>
+<span>4</span>
+<span id="extra-line-num">5</span>
+</div>
+<!-- Input do usuário -->
+<div class="flex-grow flex flex-col relative">
+<div class="text-slate-400 select-none pl-1">display: flex;</div>
+<textarea
+id="css-textarea"
+class="w-full bg-transparent text-emerald-400 focus:outline-none
+resize-none flex-grow pl-1 caret-white border-0 focus:ring-0 leading-6"
+placeholder="/* Digite seu código Flexbox aqui */"
+spellcheck="false"
+oninput="handleCSSInput()"
+></textarea>
+</div>
+</div>
+<div class="text-slate-500 mt-1 select-none">}</div>
+<!-- Botão de Verificação ou Sucesso -->
+<div class="mt-4 pt-4 border-t border-slate-800/60 flex gap-3 justify-end
+items-center">
+<span id="validation-msg" class="text-xs text-slate-400 mr-auto flex
+items-center gap-1.5 opacity-0 transition-opacity">
+<span class="w-2 h-2 rounded-full bg-amber-500 animate-
+pulse"></span>
+Alinhando veículos...
+</span>
+<button id="btn-action" onclick="checkCurrentLevelState(true)"
+class="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all
+shadow-lg shadow-blue-500/10 flex items-center gap-2">
+Estacionar 🚗
+</button>
+</div>
+</div>
+</div>
+<!-- GUIA RÁPIDO ACCORDION -->
+<div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-md">
+<button onclick="toggleCheatSheet()" class="w-full flex justify-between items-
+center text-slate-300 hover:text-white font-bold text-sm">
+<span class="flex items-center gap-2">💡 Guia Rápido de Flexbox</span>
+<span id="cheat-sheet-arrow" class="transition-transform">▼</span>
+</button>
+<div id="cheat-sheet-content" class="hidden mt-4 pt-4 border-t border-slate-800
+text-xs text-slate-400 space-y-3 max-h-[180px] overflow-y-auto">
+<div>
+<strong class="text-amber-400 code-font block">justify-content:</strong>
+<p class="mt-0.5">Define o alinhamento no eixo principal (geralmente
+horizontal):</p>
+<ul class="list-disc pl-4 mt-1 space-y-0.5">
+<li><code class="text-slate-200">flex-start</code>: Alinha ao início
+(padrão).</li>
+<li><code class="text-slate-200">flex-end</code>: Alinha ao
+final.</li>
+<li><code class="text-slate-200">center</code>: Centraliza os
+itens.</li>
+<li><code class="text-slate-200">space-between</code>: Distribui com
+espaçamento igual entre eles.</li>
+<li><code class="text-slate-200">space-around</code>: Distribui com
+espaçamento igual ao redor de cada.</li>
+</ul>
+</div>
+<div>
+<strong class="text-amber-400 code-font block">align-items:</strong>
+<p class="mt-0.5">Define o alinhamento no eixo transversal
+(vertical):</p>
+<ul class="list-disc pl-4 mt-1 space-y-0.5">
+<li><code class="text-slate-200">flex-start</code>: Topo.</li>
+<li><code class="text-slate-200">flex-end</code>: Base.</li>
+<li><code class="text-slate-200">center</code>: Alinhamento
+centralizado verticalmente.</li>
+</ul>
+</div>
+<div>
+<strong class="text-amber-400 code-font block">flex-direction:</strong>
+<p class="mt-0.5">Altera a direção dos itens no container:</p>
+<ul class="list-disc pl-4 mt-1 space-y-0.5">
+<li><code class="text-slate-200">row</code>: Linha horizontal
+(padrão).</li>
+<li><code class="text-slate-200">row-reverse</code>: Linha
+horizontal invertida.</li>
+<li><code class="text-slate-200">column</code>: Coluna
+vertical.</li>
+<li><code class="text-slate-200">column-reverse</code>: Coluna
+vertical invertida.</li>
+</ul>
+</div>
+<div>
+<strong class="text-amber-400 code-font block">flex-wrap:</strong>
+<p class="mt-0.5">Define se os itens quebram de linha:</p>
+<ul class="list-disc pl-4 mt-1 space-y-0.5">
+<li><code class="text-slate-200">nowrap</code>: Mantém tudo em uma
+única linha.</li>
+<li><code class="text-slate-200">wrap</code>: Quebra para novas
+linhas se faltar espaço.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<!-- DIREITA: O PÁTIO DE ESTACIONAMENTO (PREVISUALIZAÇÃO VISUAL) -->
+<section class="lg:col-span-7 flex flex-col">
+<div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 md:p-6 flex flex-
+col h-full shadow-xl relative min-h-[400px]">
+<div class="flex justify-between items-center mb-4">
+<span class="text-xs text-slate-400 font-bold uppercase tracking-wider flex
+items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-
+ping"></span>
+Monitoramento do Pátio (Ao vivo)
+</span>
+<span class="text-xs text-slate-500" id="collision-feedback"></span>
+</div>
+<!-- Campo de Simulação do Pátio -->
+<div class="relative flex-grow rounded-xl bg-slate-950 overflow-hidden border
+border-slate-800/80 parking-grid min-h-[300px]" id="simulation-field">
+<!-- CAMADA 1: VAGAS (ESTÁTICAS - POSIÇÃO DE SUCESSO COPIADA DO GABARITO) --
+>
+<div id="parking-spots-container" class="absolute inset-0 p-6 flex car-
+transition">
+<!-- Gerado dinamicamente -->
+</div>
+<!-- CAMADA 2: CARROS (DINÂMICOS - AFETADOS PELO FLEXBOX DO USUÁRIO) -->
+<div id="parking-cars-container" class="absolute inset-0 p-6 flex car-
+transition">
+<!-- Gerado dinamicamente -->
+</div>
+</div>
+<!-- Legenda do Pátio -->
+<div class="mt-4 flex flex-wrap justify-between items-center gap-3 text-xs text-
+slate-500 border-t border-slate-800/50 pt-4">
+<div class="flex items-center gap-4">
+<span class="flex items-center gap-1.5">
+<span class="w-3 h-3 rounded bg-blue-500/20 border border-blue-
+500/80 spot-glow"></span>
+Vaga Marcada
+</span>
+<span class="flex items-center gap-1.5">
+🚗
+Carro Ativo
+</span>
+</div>
+<span>Dica: Mantenha as cores correspondentes!</span>
+</div>
+</div>
+</section>
+</main>
+<!-- FOOTER -->
+<footer class="border-t border-slate-800/60 bg-slate-950/80 text-center py-4 text-xs text-
+slate-500 mt-6">
+<p>© 2026 Car Lines. Construído de forma interativa. Desenvolva suas habilidades em
+CSS.</p>
+</footer>
+<!-- MODAL DE SUCESSO GERAL -->
+<div id="victory-modal" class="fixed inset-0 bg-slate-950/95 z-50 hidden flex-col items-
+center justify-center p-4">
+<div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl p-8 text-
+center space-y-6 shadow-2xl relative overflow-hidden">
+<div class="absolute -top-12 -left-12 w-24 h-24 bg-blue-600/10 rounded-full blur-
+xl"></div>
+<div class="absolute -bottom-12 -right-12 w-24 h-24 bg-emerald-600/10 rounded-full
+blur-xl"></div>
+<div class="text-6xl animate-bounce">🏆</div>
+<h2 class="text-3xl font-extrabold text-white">Parabéns, Capitão!</h2>
+<p class="text-slate-300 text-sm">
+Você provou ser um verdadeiro mestre de CSS Flexbox ao alinhar e estacionar com
+precisão todos os veículos em nosso estacionamento inteligente de 10 fases!
+</p>
+<div class="p-4 bg-slate-950 rounded-xl border border-slate-800 text-left space-y-
+2">
+<span class="text-xs font-bold text-slate-400 block uppercase tracking-
+wider">Habilidades Adquiridas:</span>
+<div class="flex flex-wrap gap-1.5">
+<span class="text-xs bg-indigo-950 border border-indigo-900 text-indigo-300
+px-2 py-0.5 rounded">justify-content</span>
+<span class="text-xs bg-indigo-950 border border-indigo-900 text-indigo-300
+px-2 py-0.5 rounded">align-items</span>
+<span class="text-xs bg-indigo-950 border border-indigo-900 text-indigo-300
+px-2 py-0.5 rounded">flex-direction</span>
+<span class="text-xs bg-indigo-950 border border-indigo-900 text-indigo-300
+px-2 py-0.5 rounded">flex-wrap</span>
+<span class="text-xs bg-indigo-950 border border-indigo-900 text-indigo-300
+px-2 py-0.5 rounded">align-content</span>
+</div>
+</div>
+<div class="flex gap-4">
+<button onclick="restartGameComplete()" class="flex-grow py-3 bg-slate-800
+hover:bg-slate-700 text-slate-200 font-bold rounded-xl transition-colors">
+Jogar Novamente
+</button>
+<button onclick="backToHome()" class="flex-grow py-3 bg-gradient-to-r from-blue-
+600 to-indigo-600 text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-indigo-
+500/20">
+Ir para o Início
+</button>
+</div>
+</div>
+</div>
+<!-- JAVASCRIPT LOGIC -->
+<script>
+// CONFIGURAÇÕES DE CADA FASE
+const levels = [
+{
+id: 1,
+title: "Fase 1: Alinhamento Básico",
+difficulty: "Iniciante",
+instructions: "Ajude o carro de luxo esportivo vermelho a estacionar na vaga ao
+final do pátio utilizando a propriedade <code class='bg-slate-800 text-amber-400 px-1.5 py-0.5
+rounded text-xs code-font'>justify-content</code>.",
+hint: "Experimente digitar: <code class='text-blue-300 code-font'>justify-
+content: flex-end;</code>",
+defaultCSS: "",
+spotsCSS: "justify-content: flex-end;",
+cars: [
+{ id: "red", emoji: "🚗", color: "red", glowColor: "#ef4444" }
+]
+},
+{
+id: 2,
+title: "Fase 2: Alinhamento Central",
+difficulty: "Iniciante",
+instructions: "Estacione o taxi elétrico amarelo centralizado no pátio. Use a
+propriedade <code class='bg-slate-800 text-amber-400 px-1.5 py-0.5 rounded text-xs code-
+font'>justify-content</code>.",
+hint: "A propriedade <code class='text-blue-300 code-font'>justify-content:
+center;</code> centraliza elementos horizontalmente.",
+defaultCSS: "",
+spotsCSS: "justify-content: center;",
+cars: [
+{ id: "yellow", emoji: "🚖", color: "yellow", glowColor: "#eab308" }
+]
+},
+{
+id: 3,
+title: "Fase 3: Distribuição Equilibrada",
+difficulty: "Médio",
+instructions: "Três carros precisam de vagas perfeitamente distribuídas pelo
+pátio. Utilize um valor de <code class='bg-slate-800 text-amber-400 px-1.5 py-0.5 rounded text-
+xs code-font'>justify-content</code> que dê espaço igual ao redor de cada carro.",
+hint: "A propriedade <code class='text-blue-300 code-font'>justify-content:
+space-around;</code> cria espaçamentos iguais nas laterais de todos os elementos.",
+defaultCSS: "",
+spotsCSS: "justify-content: space-around;",
+cars: [
+{ id: "red", emoji: "🚗", color: "red", glowColor: "#ef4444" },
+{ id: "yellow", emoji: "🚖", color: "yellow", glowColor: "#eab308" },
+{ id: "blue", emoji: "🚙", color: "blue", glowColor: "#3b82f6" }
+]
+},
+{
+id: 4,
+title: "Fase 4: Alinhamento Vertical",
+difficulty: "Médio",
+instructions: "Estacione o carro esportivo azul na base do estacionamento usando
+<code class='bg-slate-800 text-amber-400 px-1.5 py-0.5 rounded text-xs code-font'>align-
+items</code>.",
+hint: "Para alinhar os itens de forma vertical ao longo do eixo transversal,
+utilize <code class='text-blue-300 code-font'>align-items: flex-end;</code>.",
+defaultCSS: "",
+spotsCSS: "align-items: flex-end;",
+cars: [
+{ id: "blue", emoji: "🚙", color: "blue", glowColor: "#3b82f6" }
+]
+},
+{
+id: 5,
+title: "Fase 5: Coordenadas Combinadas",
+difficulty: "Médio",
+instructions: "Estacione o carro clássico de colecionador roxo na extremidade
+inferior direita do pátio utilizando duas propriedades fundamentais de alinhamento.",
+hint: "Combine as propriedades <code class='text-blue-300 code-font'>justify-
+content: flex-end;</code> e <code class='text-blue-300 code-font'>align-items: flex-
+end;</code>.",
+defaultCSS: "",
+spotsCSS: "justify-content: flex-end; align-items: flex-end;",
+cars: [
+{ id: "purple", emoji: "🚘", color: "purple", glowColor: "#a855f7" }
+]
+},
+{
+id: 6,
+title: "Fase 6: O Eixo Vertical",
+difficulty: "Avançado",
+instructions: "Mude o sentido do estacionamento! Organize os carros
+verticalmente em uma coluna ordenada usando a propriedade <code class='bg-slate-800 text-amber-
+400 px-1.5 py-0.5 rounded text-xs code-font'>flex-direction</code>.",
+hint: "O padrão de direção de um container flex é em linha (row). Use <code
+class='text-blue-300 code-font'>flex-direction: column;</code> para alternar para vertical.",
+defaultCSS: "",
+spotsCSS: "flex-direction: column;",
+cars: [
+{ id: "red", emoji: "🚗", color: "red", glowColor: "#ef4444" },
+{ id: "yellow", emoji: "🚖", color: "yellow", glowColor: "#eab308" }
+]
+},
+{
+id: 7,
+title: "Fase 7: Direção e Alinhamento",
+difficulty: "Avançado",
+instructions: "Organize os carros em coluna e estacione-os no lado direito.
+Atenção: no modo <code class='bg-slate-800 text-amber-400 px-1.5 py-0.5 rounded text-xs code-
+font'>column</code>, os eixos invertem seus comportamentos!",
+hint: "Em coluna, <code class='text-blue-300 code-font'>align-items</code>
+controla o eixo horizontal! Experimente <code class='text-blue-300 code-font'>flex-direction:
+column; align-items: flex-end;</code>",
+defaultCSS: "",
+spotsCSS: "flex-direction: column; align-items: flex-end;",
+cars: [
+{ id: "blue", emoji: "🚙", color: "blue", glowColor: "#3b82f6" },
+{ id: "purple", emoji: "🚘", color: "purple", glowColor: "#a855f7" }
+]
+},
+{
+id: 8,
+title: "Fase 8: A Ordem Inversa",
+difficulty: "Avançado",
+instructions: "O pátio está com trânsito invertido! Organize os carros de
+maneira que o carro azul fique à esquerda e o vermelho à direita, com espaçamento máximo entre
+eles.",
+hint: "Utilize <code class='text-blue-300 code-font'>flex-direction: row-
+reverse;</code> juntamente com <code class='text-blue-300 code-font'>justify-content: space-
+between;</code>.",
+defaultCSS: "",
+spotsCSS: "flex-direction: row-reverse; justify-content: space-between;",
+cars: [
+{ id: "red", emoji: "🚗", color: "red", glowColor: "#ef4444" },
+{ id: "blue", emoji: "🚙", color: "blue", glowColor: "#3b82f6" }
+]
+},
+{
+id: 9,
+title: "Fase 9: O Pátio Lotado",
+difficulty: "Expert",
+instructions: "Temos carros demais para apenas uma fileira! Utilize a
+propriedade <code class='bg-slate-800 text-amber-400 px-1.5 py-0.5 rounded text-xs code-
+font'>flex-wrap</code> para que os carros excedentes quebrem para a linha de baixo de forma
+natural.",
+hint: "O valor padrão é <code class='text-blue-300 code-font'>nowrap</code>. Use
+<code class='text-blue-300 code-font'>flex-wrap: wrap;</code> para permitir múltiplas linhas.",
+defaultCSS: "",
+spotsCSS: "flex-wrap: wrap;",
+cars: [
+{ id: "red", emoji: "🚗", color: "red", glowColor: "#ef4444" },
+{ id: "yellow", emoji: "🚖", color: "yellow", glowColor: "#eab308" },
+{ id: "blue", emoji: "🚙", color: "blue", glowColor: "#3b82f6" },
+{ id: "purple", emoji: "🚘", color: "purple", glowColor: "#a855f7" },
+{ id: "green", emoji: "🟢", color: "green", glowColor: "#10b981" }
+],
+customCarStyle: "width: 30%; margin: 8px;" // Forçar tamanho menor para caber e
+quebrar
+},
+{
+id: 10,
+title: "Fase 10: O Grande Desafio",
+difficulty: "Expert",
+instructions: "Nesta última fase, organize os carros de forma que quebrem em
+múltiplas linhas, mas com as fileiras distribuídas nas extremidades superior e inferior do
+pátio.",
+hint: "Utilize <code class='text-blue-300 code-font'>flex-wrap: wrap;</code> e
+combine com a poderosa propriedade <code class='text-blue-300 code-font'>align-content: space-
+between;</code>.",
+defaultCSS: "",
+spotsCSS: "flex-wrap: wrap; align-content: space-between;",
+cars: [
+{ id: "red", emoji: "🚗", color: "red", glowColor: "#ef4444" },
+{ id: "yellow", emoji: "🚖", color: "yellow", glowColor: "#eab308" },
+{ id: "blue", emoji: "🚙", color: "blue", glowColor: "#3b82f6" },
+{ id: "purple", emoji: "🚘", color: "purple", glowColor: "#a855f7" }
+],
+customCarStyle: "width: 40%; margin: 6px;"
+}
+];
+// ESTADO GLOBAL DO JOGO
+let currentLevelIndex = 0;
+let completedLevels = [];
+let typingTimeout = null;
+// INICIALIZAÇÃO
+window.onload = function() {
+loadSavedProgress();
+buildSelectorGrid();
+checkCurrentLevelState(false); // Validar se já resolveu anteriormente (caso do
+cache)
+}
+// CARREGA PROGRESSO SALVO (localStorage opcional/local)
+function loadSavedProgress() {
+try {
+const saved = localStorage.getItem('flexbox_park_completed');
+if (saved) {
+completedLevels = JSON.parse(saved);
+}
+} catch (e) {
+console.warn("Storage inacessível, jogando no estado de memória.");
+}
+}
+function saveProgress() {
+try {
+localStorage.setItem('flexbox_park_completed', JSON.stringify(completedLevels));
+} catch (e) {}
+buildSelectorGrid();
+}
+// MONTAR TELA DE SELEÇÃO DE FASES (ATUALIZADA: Grid 3 Colunas)
+function buildSelectorGrid() {
+const grid = document.getElementById('selector-grid');
+grid.innerHTML = '';
+levels.forEach((lvl, index) => {
+const isCompleted = completedLevels.includes(lvl.id);
+const isActive = index === currentLevelIndex;
+const card = document.createElement('button');
+card.onclick = () => {
+selectLevel(index);
+hideSelectorScreen();
+};
+// Estilo aprimorado para caber bem em uma malha de 3 colunas
+card.className = `p-4 rounded-xl border flex flex-col justify-between h-32 text-
+left transition-all ${
+isCompleted
+? 'bg-emerald-950/40 border-emerald-800 text-emerald-400 hover:bg-emerald-
+900/50'
+: isActive
+? 'bg-blue-950/40 border-blue-600 text-blue-400 shadow-md shadow-blue-500/10
+hover:bg-blue-900/20'
+: 'bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800
+hover:border-slate-700'
+}`;
+card.innerHTML = `
+<div class="flex justify-between w-full items-start">
+<span class="text-[10px] font-extrabold uppercase tracking-widest text-
+slate-500">FASE</span>
+${isCompleted ? '<span class="text-xs text-emerald-400 flex items-center
+gap-1">✔</span>' : ''}
+</div>
+<div class="mt-auto">
+<div class="text-3xl font-extrabold text-white">${lvl.id}</div>
+<div class="text-xs truncate w-full mt-1 font-medium text-slate-
+300">${lvl.title.split(': ')[1]}</div>
+</div>
+`;
+grid.appendChild(card);
+});
+document.getElementById('selector-progress-txt').innerText = `Fases concluídas:
+${completedLevels.length} / ${levels.length}`;
+}
+// NAVEGAÇÃO DE FLUXO DE TELAS
+function startGame() {
+document.getElementById('start-screen').classList.add('hidden');
+loadLevel(currentLevelIndex);
+}
+function backToHome() {
+document.getElementById('start-screen').classList.remove('hidden');
+document.getElementById('selector-screen').classList.add('hidden');
+document.getElementById('victory-modal').classList.add('hidden');
+}
+function showSelectorScreen() {
+buildSelectorGrid();
+document.getElementById('selector-screen').classList.remove('hidden');
+}
+function hideSelectorScreen() {
+document.getElementById('selector-screen').classList.add('hidden');
+}
+// SELECIONAR FASE ESPECÍFICA
+function selectLevel(index) {
+currentLevelIndex = index;
+document.getElementById('start-screen').classList.add('hidden');
+loadLevel(currentLevelIndex);
+}
+// CARREGA A FASE ATUAL NA VIEW
+function loadLevel(index) {
+const level = levels[index];
+if (!level) return;
+// UI Text indicators
+document.getElementById('level-indicator').innerText =
+`${level.id}/${levels.length}`;
+document.getElementById('level-title').innerText = level.title;
+document.getElementById('level-difficulty').innerText = level.difficulty;
+document.getElementById('level-instructions').innerHTML = level.instructions;
+document.getElementById('level-hint').innerHTML = level.hint;
+// Dificuldade cor badge
+const diffBadge = document.getElementById('level-difficulty');
+diffBadge.className = "text-xs font-bold px-2.5 py-1 rounded-full uppercase
+tracking-wider ";
+if (level.difficulty === "Iniciante") {
+diffBadge.className += "bg-emerald-950 text-emerald-400 border border-emerald-
+800";
+} else if (level.difficulty === "Médio") {
+diffBadge.className += "bg-amber-950 text-amber-400 border border-amber-800";
+} else {
+diffBadge.className += "bg-red-950 text-red-400 border border-red-800";
+}
+// Textarea Reset
+const savedCSS = localStorage.getItem(`flexbox_park_lvl_${level.id}`) ||
+level.defaultCSS;
+document.getElementById('css-textarea').value = savedCSS;
+// Ajustar o número de linhas baseado nas quebras
+updateLineNumberCount();
+// Desabilitar botões se for o primeiro ou último
+document.getElementById('btn-prev').disabled = index === 0;
+document.getElementById('btn-next').disabled = index === levels.length - 1;
+// Injetar Vagas e Carros nos Containers
+renderSpotsAndCars(level);
+// Aplicar o estilo digitado para ver se já inicia correto
+applyUserStyle();
+// Fechar o guia de referência por padrão ao trocar de fase
+document.getElementById('cheat-sheet-content').classList.add('hidden');
+document.getElementById('cheat-sheet-arrow').innerText = "▼";
+}
+// GERA HTML DE VAGAS E CARROS BASEADO NO ESTADO DA FASE
+function renderSpotsAndCars(level) {
+const spotsContainer = document.getElementById('parking-spots-container');
+const carsContainer = document.getElementById('parking-cars-container');
+// Reset
+spotsContainer.innerHTML = '';
+carsContainer.innerHTML = '';
+// Aplicar estilos estáticos de gabarito para as Vagas
+spotsContainer.style.cssText = level.spotsCSS;
+// Se for nível com wrap, configuramos o layout do container
+if (level.spotsCSS.includes('wrap')) {
+spotsContainer.style.flexWrap = 'wrap';
+carsContainer.style.flexWrap = 'wrap';
+} else {
+spotsContainer.style.flexWrap = 'nowrap';
+carsContainer.style.flexWrap = 'nowrap';
+}
+// Gerar vagas
+level.cars.forEach((car, index) => {
+const spotEl = document.createElement('div');
+spotEl.id = `spot-${index}`;
+// Estilo customizado de tamanho
+const customStyle = level.customCarStyle || "width: 60px; height: 60px;";
+spotEl.className = `flex items-center justify-center rounded-xl border-2 border-
+dashed relative m-2 transition-transform duration-300 spot-glow car-transition`;
+spotEl.style.cssText = `${customStyle} border-color: ${car.glowColor};
+background-color: ${car.glowColor}15; color: ${car.glowColor};`;
+spotEl.innerHTML = `
+<span class="text-[10px] font-extrabold uppercase select-none opacity-50
+tracking-widest text-center leading-none">
+Vaga
+</span>
+<span class="absolute -top-1 -right-1 text-xs px-1 rounded-full bg-slate-900
+border border-slate-700 font-bold" style="color: ${car.glowColor}">
+P${index+1}
+</span>
+`;
+spotsContainer.appendChild(spotEl);
+});
+// Gerar carros
+level.cars.forEach((car, index) => {
+const carEl = document.createElement('div');
+carEl.id = `car-${index}`;
+const customStyle = level.customCarStyle || "width: 60px; height: 60px;";
+carEl.className = `flex items-center justify-center rounded-xl bg-slate-900
+border border-slate-700 shadow-lg relative m-2 text-3xl car-transition select-none cursor-grab
+active:cursor-grabbing hover:scale-105 active:scale-95`;
+carEl.style.cssText = `${customStyle}`;
+carEl.innerHTML = `
+<div class="absolute inset-0 bg-gradient-to-br from-slate-800/50 to-
+transparent rounded-xl"></div>
+<span class="relative z-10 filter drop-shadow">${car.emoji}</span>
+<span class="absolute -bottom-1 -right-1 text-[10px] px-1 rounded bg-slate-
+950 border border-slate-800 font-bold text-slate-400">
+N${index+1}
+</span>
+`;
+carsContainer.appendChild(carEl);
+});
+}
+// MONITORA E PROCESSA ENTRADA DE TEXTO DO USUÁRIO
+function handleCSSInput() {
+applyUserStyle();
+updateLineNumberCount();
+// Salvar no progresso atual após digitação
+const level = levels[currentLevelIndex];
+const typed = document.getElementById('css-textarea').value;
+localStorage.setItem(`flexbox_park_lvl_${level.id}`, typed);
+// Validação contínua com debounce
+if (typingTimeout) clearTimeout(typingTimeout);
+typingTimeout = setTimeout(() => {
+checkCurrentLevelState(false);
+}, 300);
+}
+// ATUALIZA NÚMERO DE LINHAS DINÁMICO
+function updateLineNumberCount() {
+const textarea = document.getElementById('css-textarea');
+const lines = textarea.value.split('\n').length;
+const lineNumContainer = document.getElementById('extra-line-num');
+// Garantir que mostre pelo menos a linha 5 se quebrar
+lineNumContainer.innerText = lines > 3 ? 1 + lines + 1 : 5;
+}
+// APLICA O ESTILO DIGITADO NO CONTAINER DOS CARROS
+function applyUserStyle() {
+const userCSS = document.getElementById('css-textarea').value;
+const container = document.getElementById('parking-cars-container');
+// Sanitização leve do CSS antes de injetar
+// Apenas adicionamos display flex e injetamos o resto
+let cleanCSS = `display: flex; `;
+// Se o usuário tentar forçar absolute positioning ou truques para burlar o flexbox,
+ignoramos
+if (!userCSS.toLowerCase().includes('position: absolute') &&
+!userCSS.toLowerCase().includes('position: fixed')) {
+cleanCSS += userCSS;
+}
+container.style.cssText = cleanCSS;
+}
+// VERIFICA SE OS CARROS COLIDIRAM / SE ENCAIXARAM COM AS VAGAS
+function checkCurrentLevelState(showModalOnWin = false) {
+const level = levels[currentLevelIndex];
+const validationMsg = document.getElementById('validation-msg');
+const btnAction = document.getElementById('btn-action');
+validationMsg.style.opacity = '1';
+// Pequeno delay para garantir que a transição de renderização do CSS já ocorreu no
+navegador
+setTimeout(() => {
+let allAligned = true;
+const tolerance = 15; // Tolerância em pixels para considerar como alinhado
+for (let i = 0; i < level.cars.length; i++) {
+const carEl = document.getElementById(`car-${i}`);
+const spotEl = document.getElementById(`spot-${i}`);
+if (!carEl || !spotEl) {
+allAligned = false;
+break;
+}
+const carRect = carEl.getBoundingClientRect();
+const spotRect = spotEl.getBoundingClientRect();
+// Calcula distância absoluta de centros
+const carCenterX = carRect.left + carRect.width / 2;
+const carCenterY = carRect.top + carRect.height / 2;
+const spotCenterX = spotRect.left + spotRect.width / 2;
+const spotCenterY = spotRect.top + spotRect.height / 2;
+const distX = Math.abs(carCenterX - spotCenterX);
+const distY = Math.abs(carCenterY - spotCenterY);
+// Se a distância for maior que a tolerância, falha
+if (distX > tolerance || distY > tolerance) {
+allAligned = false;
+// Remover classes de sucesso se houverem
+spotEl.classList.remove('border-solid', 'bg-emerald-500/20');
+spotEl.classList.add('border-dashed');
+} else {
+// Visual feedback para vaga preenchida
+spotEl.classList.remove('border-dashed');
+spotEl.classList.add('border-solid', 'bg-emerald-500/20');
+}
+}
+if (allAligned) {
+validationMsg.innerHTML = `🟢 Todos estacionados com sucesso!`;
+btnAction.innerText = "Fase Concluída! ➔";
+btnAction.className = "px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-
+white font-bold rounded-xl transition-all shadow-lg shadow-emerald-500/20 flex items-center gap-
+2";
+if (!completedLevels.includes(level.id)) {
+completedLevels.push(level.id);
+saveProgress();
+}
+if (showModalOnWin) {
+triggerWinConfetti();
+setTimeout(() => {
+goToNextStep();
+}, 800);
+}
+} else {
+validationMsg.innerHTML = `<span class='w-2 h-2 rounded-full bg-amber-500
+animate-pulse'></span> Alinhando veículos...`;
+btnAction.innerText = "Estacionar 🚗";
+btnAction.className = "px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white
+font-bold rounded-xl transition-all shadow-lg shadow-blue-500/10 flex items-center gap-2";
+}
+}, 50);
+}
+// SEGUE PARA A PRÓXIMA FASE OU ABRE O MODAL FINAL DE VITÓRIA
+function goToNextStep() {
+if (currentLevelIndex < levels.length - 1) {
+currentLevelIndex++;
+loadLevel(currentLevelIndex);
+} else {
+// Fim de jogo total!
+document.getElementById('victory-modal').classList.remove('hidden');
+triggerWinConfettiLoop();
+}
+}
+// RESET DA FASE INDIVIDUAL
+function resetLevelInput() {
+const level = levels[currentLevelIndex];
+document.getElementById('css-textarea').value = level.defaultCSS;
+localStorage.removeItem(`flexbox_park_lvl_${level.id}`);
+handleCSSInput();
+}
+// RESET DO PROGRESSO DE TODAS AS FASES
+function resetProgress() {
+if (confirm("Deseja realmente limpar todo o progresso de fases salvas?")) {
+completedLevels = [];
+levels.forEach(lvl => {
+localStorage.removeItem(`flexbox_park_lvl_${lvl.id}`);
+});
+saveProgress();
+currentLevelIndex = 0;
+loadLevel(0);
+hideSelectorScreen();
+}
+}
+function restartGameComplete() {
+completedLevels = [];
+levels.forEach(lvl => {
+localStorage.removeItem(`flexbox_park_lvl_${lvl.id}`);
+});
+saveProgress();
+currentLevelIndex = 0;
+loadLevel(0);
+document.getElementById('victory-modal').classList.add('hidden');
+}
+// NAVEGAÇÃO ENTRE FASES (BOTOES DO TOPO)
+function prevLevel() {
+if (currentLevelIndex > 0) {
+currentLevelIndex--;
+loadLevel(currentLevelIndex);
+}
+}
+function nextLevel() {
+if (currentLevelIndex < levels.length - 1) {
+currentLevelIndex++;
+loadLevel(currentLevelIndex);
+}
+}
+// CONTROLE DO ACCORDION DO GUIA RÁPIDO
+function toggleCheatSheet() {
+const content = document.getElementById('cheat-sheet-content');
+const arrow = document.getElementById('cheat-sheet-arrow');
+if (content.classList.contains('hidden')) {
+content.classList.remove('hidden');
+arrow.innerText = "▲";
+} else {
+content.classList.add('hidden');
+arrow.innerText = "▼";
+}
+}
+// PARTICLES & CONFETTI SYSTEM (Leve e performático rodado direto no canvas)
+const canvas = document.getElementById('particleCanvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+function resizeCanvas() {
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+class Particle {
+constructor(x, y, isConfetti = false) {
+this.x = x;
+this.y = y;
+this.size = isConfetti ? Math.random() * 8 + 4 : Math.random() * 4 + 2;
+this.speedX = Math.random() * 10 - 5;
+this.speedY = isConfetti ? Math.random() * -12 - 5 : Math.random() * -4 - 1;
+this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+this.rotation = Math.random() * 360;
+this.rotationSpeed = Math.random() * 10 - 5;
+this.weight = isConfetti ? 0.3 : 0.05;
+}
+update() {
+this.x += this.speedX;
+this.y += this.speedY;
+this.speedY += this.weight;
+this.rotation += this.rotationSpeed;
+}
+draw() {
+ctx.save();
+ctx.translate(this.x, this.y);
+ctx.rotate((this.rotation * Math.PI) / 180);
+ctx.fillStyle = this.color;
+ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+ctx.restore();
+}
+}
+function triggerWinConfetti() {
+// Emite do centro-baixo da tela
+for (let i = 0; i < 100; i++) {
+particles.push(new Particle(canvas.width / 2, canvas.height, true));
+}
+animateParticles();
+}
+function triggerWinConfettiLoop() {
+// Rajadas repetidas no final
+let interval = setInterval(() => {
+if (document.getElementById('victory-modal').classList.contains('hidden')) {
+clearInterval(interval);
+return;
+}
+// Explosão à esquerda
+for (let i = 0; i < 30; i++) {
+particles.push(new Particle(canvas.width * 0.2, canvas.height, true));
+}
+// Explosão à direita
+for (let i = 0; i < 30; i++) {
+particles.push(new Particle(canvas.width * 0.8, canvas.height, true));
+}
+}, 1200);
+animateParticles();
+}
+let animationFrameId = null;
+function animateParticles() {
+ctx.clearRect(0, 0, canvas.width, canvas.height);
+for (let i = 0; i < particles.length; i++) {
+particles[i].update();
+particles[i].draw();
+// Remover fora da tela
+if (particles[i].y > canvas.height + 20 || particles[i].x < -20 ||
+particles[i].x > canvas.width + 20) {
+particles.splice(i, 1);
+i--;
+}
+}
+if (particles.length > 0) {
+animationFrameId = requestAnimationFrame(animateParticles);
+} else {
+cancelAnimationFrame(animationFrameId);
+animationFrameId = null;
+}
+}
+</script>
+</body>
+</html>
